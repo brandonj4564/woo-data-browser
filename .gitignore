@@ -1,0 +1,5 @@
+﻿__pycache__
+*.rds
+*.h5Seurat
+venv
+test.py
