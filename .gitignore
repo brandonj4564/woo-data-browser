@@ -2,4 +2,7 @@
 *.rds
 *.h5Seurat
 venv
+.venv
 test.py
+test.R
+data

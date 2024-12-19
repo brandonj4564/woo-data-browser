@@ -1,7 +1,4 @@
 shiny
-shinywidgets
-plotly
 pandas
-scanpy
 matplotlib
-
+scanpy

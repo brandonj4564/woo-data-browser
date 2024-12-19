@@ -4,16 +4,14 @@ from shiny import reactive
 from shiny.express import input, render, ui
 from shared import adata_dict, obs_metadata_dict, genes_dict, hpf10_genes
 import scanpy as sc
-import numpy as np
 import io
 
-app_dir = Path(__file__).parent
-ui.include_css(app_dir / "styles.css")
-
 dataSet = reactive.value("8 hours past fertilization")
-ui.page_opts(title="Woo Lab Dataset", fillable=True)
 
 # ui.panel_title("Woo Lab Dataset")
+ui.page_opts(title="Woo Lab Dataset", fillable=True)
+ui.include_css(Path(__file__).parent / "styles.css")
+
 
 with ui.sidebar():
     ui.input_select(
@@ -33,7 +31,7 @@ with ui.sidebar():
     def _():
         # This updates the dataSet var when the select menu changes
         dataSet.set(input.hpf_data())
-        
+
     @render.ui
     def obs_meta_ui():
         obs_metadata = obs_metadata_dict[dataSet.get()]
@@ -54,165 +52,150 @@ with ui.sidebar():
             multiple=True,
             selected="sox32",
         )
-        
+
     @render.download(label="Download PNG", filename="figure.png")
-    def download_png():
+    def download_fig_png():
         tab = input.tab()
-        adata = adata_dict[dataSet.get()]
         markers = list(input.specific_gene())
-        
+        adata = adata_dict[dataSet.get()]
+
         if tab == "Gene UMAP":
             color_column = input.obs_meta()
+            adata = adata_dict[dataSet.get()]
             sc.pl.umap(
                 adata,
                 color=color_column,
+                # save=True,  # Save the plot directly to filepath
                 show=False,
-                title=f"hpf5: UMAP colored by {color_column}",
             )
-            
         elif tab == "Violin Plot":
-            if input.specific_gene() != ():
-                sc.pl.stacked_violin(
-                    adata,
-                    markers,
-                    groupby=input.obs_meta(),
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-        
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.stacked_violin(
+                adata,
+                markers,
+                groupby=input.obs_meta(),
+                show=False,
+            )
         elif tab == "Dot Plot":
-            if input.specific_gene() != ():
-                sc.pl.dotplot(
-                    adata,
-                    var_names=markers,
-                    groupby=input.obs_meta(),
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-        
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.dotplot(
+                adata,
+                var_names=markers,
+                groupby=input.obs_meta(),
+                show=False,
+            )
         elif tab == "Feature Plot":
-            if input.specific_gene() != ():
-                sc.pl.umap(
-                    adata,
-                    color=markers,
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-            
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.umap(
+                adata,
+                color=markers,
+                show=False,
+            )
+
         with io.BytesIO() as buf:
             plt.savefig(buf, format="png", bbox_inches="tight")
             yield buf.getvalue()
 
-    @render.download(label="Download JPEG", filename="figure.jpeg")
-    def download_jpeg():
+    @render.download(label="Download PDF", filename="figure.pdf")
+    def download_fig_pdf():
         tab = input.tab()
-        adata = adata_dict[dataSet.get()]
         markers = list(input.specific_gene())
-        
+        adata = adata_dict[dataSet.get()]
+
         if tab == "Gene UMAP":
             color_column = input.obs_meta()
+            adata = adata_dict[dataSet.get()]
             sc.pl.umap(
                 adata,
                 color=color_column,
+                # save=True,  # Save the plot directly to filepath
                 show=False,
-                title=f"hpf5: UMAP colored by {color_column}",
             )
-            
         elif tab == "Violin Plot":
-            if input.specific_gene() != ():
-                sc.pl.stacked_violin(
-                    adata,
-                    markers,
-                    groupby=input.obs_meta(),
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-        
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.stacked_violin(
+                adata,
+                markers,
+                groupby=input.obs_meta(),
+                show=False,
+            )
         elif tab == "Dot Plot":
-            if input.specific_gene() != ():
-                sc.pl.dotplot(
-                    adata,
-                    var_names=markers,
-                    groupby=input.obs_meta(),
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-        
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.dotplot(
+                adata,
+                var_names=markers,
+                groupby=input.obs_meta(),
+                show=False,
+            )
         elif tab == "Feature Plot":
-            if input.specific_gene() != ():
-                sc.pl.umap(
-                    adata,
-                    color=markers,
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-            
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.umap(
+                adata,
+                color=markers,
+                show=False,
+            )
+
         with io.BytesIO() as buf:
-            plt.savefig(buf, format="jpeg", bbox_inches="tight")
+            plt.savefig(buf, format="pdf", bbox_inches="tight")
             yield buf.getvalue()
 
     @render.download(label="Download SVG", filename="figure.svg")
-    def download_svg():
+    def download_fig_svg():
         tab = input.tab()
-        adata = adata_dict[dataSet.get()]
         markers = list(input.specific_gene())
-        
+        adata = adata_dict[dataSet.get()]
+
         if tab == "Gene UMAP":
             color_column = input.obs_meta()
+            adata = adata_dict[dataSet.get()]
             sc.pl.umap(
                 adata,
                 color=color_column,
+                # save=True,  # Save the plot directly to filepath
                 show=False,
-                title=f"hpf5: UMAP colored by {color_column}",
             )
-            
         elif tab == "Violin Plot":
-            if input.specific_gene() != ():
-                sc.pl.stacked_violin(
-                    adata,
-                    markers,
-                    groupby=input.obs_meta(),
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-        
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.stacked_violin(
+                adata,
+                markers,
+                groupby=input.obs_meta(),
+                show=False,
+            )
         elif tab == "Dot Plot":
-            if input.specific_gene() != ():
-                sc.pl.dotplot(
-                    adata,
-                    var_names=markers,
-                    groupby=input.obs_meta(),
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-        
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.dotplot(
+                adata,
+                var_names=markers,
+                groupby=input.obs_meta(),
+                show=False,
+            )
         elif tab == "Feature Plot":
-            if input.specific_gene() != ():
-                sc.pl.umap(
-                    adata,
-                    color=markers,
-                    show=False,
-                )
-            else:
-                yield "No gene selected"
-                raise Exception("No gene selected")
-            
+            if input.specific_gene() == ():
+                raise Exception("Add at least one gene!")
+
+            sc.pl.umap(
+                adata,
+                color=markers,
+                show=False,
+            )
+
         with io.BytesIO() as buf:
             plt.savefig(buf, format="svg", bbox_inches="tight")
             yield buf.getvalue()
@@ -221,23 +204,30 @@ with ui.sidebar():
 with ui.navset_pill(id="tab"):
 
     with ui.nav_panel("Gene UMAP"):
-        
         with ui.card():
-            @render.plot
+
+            @render.plot()
             def umap_plot():
                 color_column = input.obs_meta()
                 adata = adata_dict[dataSet.get()]
+
                 sc.pl.umap(
                     adata,
                     color=color_column,
                     show=False,
-                    title=f"hpf5: UMAP colored by {color_column}",
+                    title=f"UMAP colored by {color_column}",
                 )
                 return plt.gcf()
 
     with ui.nav_panel("Violin Plot"):
 
         with ui.card():
+
+            @render.text
+            def no_gene_selected_violin():
+                if input.specific_gene() == ():
+                    return "Select a gene to generate a plot."
+
             @render.plot
             def violin_plot():
 
@@ -260,11 +250,16 @@ with ui.navset_pill(id="tab"):
                         show=False,
                     )
 
-                    return plt.gcf()
+                return plt.gcf()
 
     with ui.nav_panel("Dot Plot"):
-        
         with ui.card():
+
+            @render.text
+            def no_gene_selected_dot():
+                if input.specific_gene() == ():
+                    return "Select a gene to generate a plot."
+
             @render.plot
             def dot_plot():
                 markers = list(input.specific_gene())
@@ -277,24 +272,30 @@ with ui.navset_pill(id="tab"):
                         show=False,
                     )
 
-                    # plt.title("Dot Plot: Top Marker Genes")
-                    # plt.xlabel("Clusters")
-                    # plt.ylabel("Genes")
+                    plt.title("Dot Plot: Top Marker Genes")
+                    plt.xlabel("Clusters")
+                    plt.ylabel("Genes")
 
-                    return plt.gcf()
+                return plt.gcf()
 
     with ui.nav_panel("Feature Plot"):
-
         with ui.card():
+
+            @render.text
+            def no_gene_selected_feature():
+                if input.specific_gene() == ():
+                    return "Select a gene to generate a plot."
+
             @render.plot
             def feature_plot():
                 markers = list(input.specific_gene())
 
-                if len(markers) > 0:
+                if input.specific_gene() != ():
                     adata = adata_dict[dataSet.get()]
                     sc.pl.umap(
                         adata,
                         color=markers,
                         show=False,
                     )
-                    return plt.gcf()
+
+                return plt.gcf()
