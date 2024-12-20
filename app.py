@@ -18,7 +18,6 @@ with ui.sidebar():
         "hpf_data",
         "Select data set",
         choices=[
-            "5 hours past fertilization",
             "8 hours past fertilization",
             "10 hours past fertilization",
             "12 hours past fertilization",
