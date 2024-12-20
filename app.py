@@ -9,6 +9,8 @@ import scanpy as sc
 import io
 
 dataSet = reactive.value("8 hours past fertilization")
+gene_list = reactive.value(("sox32"))
+prev_obs_metadata = reactive.value("celltypes")
 
 # ui.panel_title("Woo Lab Dataset")
 ui.page_opts(title="Woo Lab Dataset", fillable=True)
@@ -32,6 +34,18 @@ with ui.sidebar():
     def _():
         # This updates the dataSet var when the select menu changes
         dataSet.set(input.hpf_data())
+        ui.update_selectize("specific_gene", selected=gene_list.get())
+        ui.update_select("obs_meta", selected=prev_obs_metadata.get())
+
+    @reactive.effect
+    @reactive.event(input.specific_gene)
+    def _():
+        gene_list.set(input.specific_gene())
+
+    @reactive.effect
+    @reactive.event(input.obs_meta)
+    def _():
+        prev_obs_metadata.set(input.obs_meta())
 
     @render.ui
     def obs_meta_ui():
@@ -71,14 +85,14 @@ with ui.navset_pill(id="tab"):
             @render.text
             def no_gene_selected_feature():
                 if input.specific_gene() == ():
-                    return "Select a gene to generate a plot."
+                    return "Select a gene to generate a plot. There may be a buggy leftover graph shown below."
 
             @render.plot
             def feature_plot():
                 markers = list(input.specific_gene())
 
                 if input.specific_gene() == ():  # Check if no genes are selected
-                    return
+                    return plt.gcf()
 
                 adata = adata_dict[dataSet.get()]
                 num_markers = len(markers)
