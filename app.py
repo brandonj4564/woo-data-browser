@@ -77,13 +77,45 @@ with ui.navset_pill(id="tab"):
             def feature_plot():
                 markers = list(input.specific_gene())
 
-                if input.specific_gene() != ():
-                    adata = adata_dict[dataSet.get()]
+                if input.specific_gene() == ():  # Check if no genes are selected
+                    return
 
+                adata = adata_dict[dataSet.get()]
+                num_markers = len(markers)
+
+                # Dynamically determine the number of columns (up to 3) and rows
+                cols = min(
+                    num_markers, 3
+                )  # Use 1 column for 1 gene, 2 for 2 genes, etc., up to 3
+                rows = -(-num_markers // cols)  # Ceiling division to determine rows
+
+                # Create subplots with the calculated grid size
+                fig, axes = plt.subplots(rows, cols)
+                axes = (
+                    axes.flatten() if num_markers > 1 else [axes]
+                )  # Flatten or wrap single axis
+
+                # Plot each UMAP
+                for i, marker in enumerate(markers):
+                    ax = axes[i]
                     sc.pl.umap(
-                        adata, color=markers, show=False, color_map=gray_to_purple
+                        adata, color=marker, show=False, ax=ax, color_map=gray_to_purple
                     )
+                    ax.set_title(f"{marker}")
 
+                    # # Disable x and y axis labels
+                    # ax.set_xlabel("")  # Remove "UMAP 1"
+                    # ax.set_ylabel("")  # Remove "UMAP 2"
+
+                # Hide unused axes
+                for j in range(len(markers), len(axes)):
+                    fig.delaxes(axes[j])
+
+                plt.subplots_adjust(
+                    hspace=0.25,  # Height space between rows
+                    wspace=0.25,  # Width space between columns
+                )
+                plt.tight_layout(pad=2.0)  # Adjust spacing between plots
                 return plt.gcf()
 
             with ui.layout_columns():
