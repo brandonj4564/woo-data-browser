@@ -38,16 +38,22 @@ genes_dict = {
 # Define datasets and obs_key
 obs_key = "celltypes"  # Replace with your actual obs_key
 
-# Collect all unique categories across datasets
-all_categories = set()
-for adata in adata_dict.values():
-    all_categories.update(adata.obs[obs_key].unique())
+shared_categories = set.intersection(
+    *(set(adata.obs[obs_key].unique()) for adata in adata_dict.values())
+)
+print("Shared categories:", shared_categories)
 
-# Define the common order for the categories
-common_order = sorted(all_categories)  # Adjust the sorting if needed
-
-# Apply the common order to all datasets
+# Ensure shared categories are consistently ordered across datasets
 for adata in adata_dict.values():
+    shared_order = sorted(shared_categories)
+    unique_categories = [
+        cat for cat in adata.obs[obs_key].unique() if cat not in shared_categories
+    ]
+    full_order = shared_order + unique_categories
+
+    # Reorder categories for the obs_key
     adata.obs[obs_key] = pd.Categorical(
-        adata.obs[obs_key], categories=common_order, ordered=True
+        adata.obs[obs_key],
+        categories=full_order,
+        ordered=True,
     )
