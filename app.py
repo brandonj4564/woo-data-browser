@@ -9,8 +9,8 @@ import scanpy as sc
 import io
 
 dataSet = reactive.value("8 hours past fertilization")
-gene_list = reactive.value(("sox32"))
-prev_obs_metadata = reactive.value("celltypes")
+gene_list = reactive.value(("cyt1"))
+prev_obs_metadata = reactive.value("Cell Types")
 
 # ui.panel_title("Woo Lab Dataset")
 ui.page_opts(title="Woo Lab Dataset", fillable=True)
@@ -25,6 +25,7 @@ with ui.sidebar():
             "8 hours past fertilization",
             "10 hours past fertilization",
             "12 hours past fertilization",
+            "Integrated data",
         ],
         selected="8 hours past fertilization",
     )
@@ -54,7 +55,7 @@ with ui.sidebar():
             "obs_meta",
             "Select gene metadata",
             choices=obs_metadata,
-            selected="celltypes",
+            selected="Cell Types",
         )
 
     @render.ui
@@ -65,19 +66,19 @@ with ui.sidebar():
             "Select gene",
             choices=gene_list,
             multiple=True,
-            selected="sox32",
+            selected="cyt1",
         )
 
 
 with ui.navset_pill(id="tab"):
 
-    with ui.nav_panel("Gene UMAP"):
+    with ui.nav_panel("Feature Plots"):
         with ui.card():
             # Define colors for the gradient: gray to dark blue/purple
             colors = [
-                "#808080",
-                "#4B0082",
-            ]  # Gray (#808080) to indigo (#4B0082)
+                "#D3D3D3",
+                "#3A53A4",
+            ]  # Gray (#D3D3D3) to purple (#3A53A4)
 
             # Create the colormap
             gray_to_purple = LinearSegmentedColormap.from_list("GrayToPurple", colors)
@@ -273,8 +274,8 @@ with ui.navset_pill(id="tab"):
 
                 # sc.pl.violin(
                 #     adata,
-                #     keys="sox32",  # Gene or metadata field
-                #     groupby="celltypes",  # Categorical variable for grouping
+                #     keys="cyt1",  # Gene or metadata field
+                #     groupby="Cell Types",  # Categorical variable for grouping
                 #     jitter=True,  # Add jitter to points
                 #     scale="width",
                 #     show=True,
@@ -370,10 +371,6 @@ with ui.navset_pill(id="tab"):
                         groupby=input.obs_meta(),
                         show=False,
                     )
-
-                    plt.title("Dot Plot: Top Marker Genes")
-                    plt.xlabel("Clusters")
-                    plt.ylabel("Genes")
 
                 return plt.gcf()
 
