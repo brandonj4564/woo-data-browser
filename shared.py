@@ -7,18 +7,50 @@ app_dir = Path(__file__).parent
 hpf8_adata = sc.read_h5ad(app_dir / "data/8hpf_data.h5ad")
 hpf8_obs_metadata = hpf8_adata.obs_keys()
 hpf8_genes = list(hpf8_adata.var_names)
+# Rename Neural Plate to Neural Ectoderm
+# Ensure the column is categorical
+if hpf8_adata.obs["Cell Types"].dtype.name == "category":
+    hpf8_adata.obs["Cell Types"] = hpf8_adata.obs["Cell Types"].cat.rename_categories(
+        {"Neural Plate": "Neural Ectoderm"}
+    )
+else:
+    # Fallback for non-categorical columns
+    hpf8_adata.obs["Cell Types"] = hpf8_adata.obs["Cell Types"].replace(
+        "Neural Plate", "Neural Ectoderm"
+    )
 
 hpf10_adata = sc.read_h5ad(app_dir / "data/10hpf_data.h5ad")
 hpf10_obs_metadata = hpf10_adata.obs_keys()
 hpf10_genes = list(hpf10_adata.var_names)
+# Rename Neural Plate to Neural Ectoderm
+if hpf10_adata.obs["Cell Types"].dtype.name == "category":
+    hpf10_adata.obs["Cell Types"] = hpf10_adata.obs["Cell Types"].cat.rename_categories(
+        {"Neural Plate": "Neural Ectoderm"}
+    )
+else:
+    # Fallback for non-categorical columns
+    hpf10_adata.obs["Cell Types"] = hpf10_adata.obs["Cell Types"].replace(
+        "Neural Plate", "Neural Ectoderm"
+    )
 
 hpf12_adata = sc.read_h5ad(app_dir / "data/12hpf_data.h5ad")
 hpf12_obs_metadata = hpf12_adata.obs_keys()
 hpf12_genes = list(hpf12_adata.var_names)
+# hpf12 does not have a Neural Plate column so it doesn't need to rename it
 
 integrated_adata = sc.read_h5ad(app_dir / "data/integrated_data.h5ad")
 integrated_obs_metadata = integrated_adata.obs_keys()
 integrated_genes = list(integrated_adata.var_names)
+# Rename Neural Plate to Neural Ectoderm
+if integrated_adata.obs["Cell Types"].dtype.name == "category":
+    integrated_adata.obs["Cell Types"] = integrated_adata.obs[
+        "Cell Types"
+    ].cat.rename_categories({"Neural Plate": "Neural Ectoderm"})
+else:
+    # Fallback for non-categorical columns
+    integrated_adata.obs["Cell Types"] = integrated_adata.obs["Cell Types"].replace(
+        "Neural Plate", "Neural Ectoderm"
+    )
 
 adata_dict = {
     "8 hours past fertilization": hpf8_adata,
