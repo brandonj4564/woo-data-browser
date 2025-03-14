@@ -103,24 +103,24 @@ createCellTypeColors(integrated_adata, group_colors)
 
 # # This section changes the obs keys of all datasets to be in the same order to have the same color scheme
 # # Define datasets and obs_key
-# obs_key = "Cell Types"  # Replace with your actual obs_key
+obs_key = "Cell Types" 
 
-# shared_categories = set.intersection(
-#     *(set(adata.obs[obs_key].unique()) for adata in adata_dict.values())
-# )
-# print("Shared categories:", shared_categories)
+shared_categories = set.intersection(
+    *(set(adata.obs[obs_key].unique()) for adata in adata_dict.values())
+)
+print("Shared categories:", shared_categories)
 
-# # Ensure shared categories are consistently ordered across datasets
-# for adata in adata_dict.values():
-#     shared_order = sorted(shared_categories)
-#     unique_categories = [
-#         cat for cat in adata.obs[obs_key].unique() if cat not in shared_categories
-#     ]
-#     full_order = shared_order + unique_categories
+# Ensure shared categories are consistently ordered across datasets
+for adata in adata_dict.values():
+    shared_order = sorted(shared_categories)
+    unique_categories = [
+        cat for cat in adata.obs[obs_key].unique() if cat not in shared_categories
+    ]
+    full_order = shared_order + unique_categories
 
-#     # Reorder categories for the obs_key
-#     adata.obs[obs_key] = pd.Categorical(
-#         adata.obs[obs_key],
-#         categories=full_order,
-#         ordered=True,
-#     )
+    # Reorder categories for the obs_key
+    adata.obs[obs_key] = pd.Categorical(
+        adata.obs[obs_key],
+        categories=full_order,
+        ordered=True,
+    )
