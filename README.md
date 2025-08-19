@@ -7,7 +7,9 @@ This project is a **Shiny for Python** web application that visualizes **Zebrafi
 - **Dot Plots**  
 - **Violin Plots**  
 
-This tool is designed to help researchers explore and analyze single-cell data interactively.  
+This tool is designed to help researchers explore and analyze single-cell data interactively.
+
+![Screenshot of Data Browser](./woo-data-browser.png)
 
 ## **Installation**  
 
